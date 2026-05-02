@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Conlang: [Name]</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --accent: #3498db;
+            --bg: #f4f7f6;
+            --text: #333;
+            --card-bg: #ffffff;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            padding: 40px 0;
+            background: var(--primary);
+            color: white;
+            border-radius: 12px;
+            margin-bottom: 30px;
+        }
+
+        section {
+            background: var(--card-bg);
+            padding: 25px;
+            margin-bottom: 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        h2 {
+            color: var(--accent);
+            border-bottom: 2px solid var(--bg);
+            padding-bottom: 10px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        th, td {
+            padding: 12px;
+            border: 1px solid #eee;
+            text-align: left;
+        }
+
+        th { background-color: #f9f9f9; font-weight: 600; }
+
+        .ipa { font-family: "Lucida Sans Unicode", sans-serif; color: #e67e22; }
+
+        .lexicon-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .word-card {
+            border-left: 4px solid var(--accent);
+            padding-left: 15px;
+            background: #fafafa;
+        }
+
+        .word-card strong { color: var(--primary); }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Modern Ruthenian</h1>
+        <p>An archaic East Slavic language</p>
+    </header>
+
+    <section id="introduction">
+        <h2>Overview</h2>
+        <p>This language is an "a posteriori" conlang created just because. It has no goals or uses, but is simply one of my many natlang-inspired projects created simply for the sake of creating.</p>
+    </section>
+
+    <section id="phonology">
+        <h2>Phonology (Consonants)</h2>
+        <p>The phonology of the language is almost entirely identical to that of other East Slavic languages, as they all have very few differences from one another. It is usually considered to be closest to that of Ukrainian, as that is also Modern Ruthenian's closest living relative.</p>
+        <table>
+            <thead>
+                <tr>
+                    <th>Consonants</th>
+                    <th>Labial</th>
+                    <th>Alveolar</th>
+                    <th>Palatal</th>
+                    <th>Velar</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Nasal</td>
+                    <td class="ipa">m (м)</td>
+                    <td class="ipa">n (н)</td>
+                    <td class="ipa"></td>
+                    <td class="ipa"></td>
+                </tr>
+                <tr>
+                    <td>Plosive</td>
+                    <td class="ipa">p (п) b (б)</td>
+                    <td class="ipa">t (т) d (д)</td>
+                    <td class="ipa"></td>
+                    <td class="ipa">k (к)</td>
+                </tr>
+                <tr>
+                    <td>Affricate</td>
+                    <td class="ipa"></td>
+                    <td class="ipa">t͡s (ц) d͡z (дз)</td>
+                    <td class="ipa">t͡ʃ (ч) d͡ʒ (дж)</td>
+                    <td class="ipa"></td>
+                </tr>
+                <tr>
+                    <td>Fricative</td>
+                    <td class="ipa">f (ф) v (в)</td>
+                    <td class="ipa">s (с) z (з)</td>
+                    <td class="ipa">ʃ (ш) ʒ (ж)</td>
+                    <td class="ipa">x (х) ɦ (г)</td>
+                </tr>
+                <tr>
+                    <td>Approximant</td>
+                    <td class="ipa"></td>
+                    <td class="ipa">ɫ (л)</td>
+                    <td class="ipa">j (й)</td>
+                    <td class="ipa"></td>
+                </tr>
+                <tr>
+                    <td>Rhotic</td>
+                    <td class="ipa"></td>
+                    <td class="ipa">r (р)</td>
+                    <td class="ipa"></td>
+                    <td class="ipa"></td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <h2>Phonology (Vowels)</h2>
+        <p>Modern Ruthenian, just like all of its relatives (excpet for Russian), has a pretty simple vowel system.</p>
+        <table>
+          <thead>
+            <tr>
+              <th>Vowels</th>
+                    <th>Front</th>
+                    <th>Central</th>
+                    <th>Back</th>
+            </tr>
+            <tbody>
+              <tr>
+                    <td>Close</td>
+                    <td class="ipa">i (і)</td>
+                    <td class="ipa">ɪ/ɨ (и)</td>
+                    <td class="ipa">u (у)</td>
+                </tr>
+                <tr>
+                    <td>Mid</td>
+                    <td class="ipa">ɛ (е)</td>
+                    <td class="ipa"></td>
+                    <td class="ipa">ɔ (о)</td>
+                </tr>
+                <tr>
+                    <td>Open</td>
+                    <td class="ipa"></td>
+                    <td class="ipa">a (а)</td>
+                    <td class="ipa"></td>
+                </tr>
+            </tbody>
+          </thead>
+        </table>
+    </section>
+
+    <section id="grammar">
+        <h2>Grammar: Noun Declensions</h2>
+        <p>The language features a robust system of seven cases (Nominative, Genitive, Dative, Accusative, Instrumental, Locative, Vocative), three genders (Masculine, Feminine, Neuter), and three numbers (Singular, Dual, Plural). Below are the main declensions:</p>
+        <table>
+            <tr>
+                <th>хліб (bread)</th>
+                <th>Singular</th>
+                <th>Dual</th>
+                <th>Plural</th>
+            </tr>
+            <tr>
+                <td>Nominative</td>
+                <td>хліб</td>
+                <td>хліба́</td>
+                <td>хлібі́</td>
+            </tr>
+            <tr>
+                <td>Accusative</td>
+                <td>хліб</td>
+                <td>хліба́</td>
+                <td>хліби́</td>
+            </tr>
+            <tr>
+                <td>Genitive</td>
+                <td>хлі́ба</td>
+                <td>хлі́бу</td>
+                <td>хлібо́в</td>
+            </tr>
+            <tr>
+                <td>Dative</td>
+                <td>хлі́бу</td>
+                <td>хлі́бома</td>
+                <td>хліба́м</td>
+            </tr>
+            <tr>
+                <td>Instrumental</td>
+                <td>хлі́бом</td>
+                <td>хлі́бома</td>
+                <td>хліба́мі</td>
+            </tr>
+            <tr>
+                <td>Locative</td>
+                <td>хлі́бі</td>
+                <td>хлі́бу</td>
+                <td>хлібі́х</td>
+            </tr>
+            <tr>
+                <td>Vocative</td>
+                <td>хлі́бе</td>
+                <td>хліба́</td>
+                <td>хлібі́</td>
+            </tr>
+        </table>
+    </section>
+
+</div>
+
+</body>
+</html>
