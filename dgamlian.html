@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dgamlian Verb Conjugator</title>
+    <style>
+        :root {
+            --bg: #04060a;
+            --panel: #0d111d;
+            --accent: #10b981;
+            --accent-glow: rgba(16, 185, 129, 0.15);
+            --text: #e2e8f0;
+            --muted: #4b5563;
+            --border: #1f2937;
+            --active-slot: #38bdf8;
+            --ablaut-color: #a855f7;
+        }
+        body {
+            font-family: 'Courier New', Courier, monospace;
+            background-color: var(--bg);
+            color: var(--text);
+            padding: 20px;
+            margin: 0;
+        }
+        .container { max-width: 1450px; margin: 0 auto; }
+        h1 { color: var(--accent); margin: 0 0 5px 0; font-size: 1.6rem; text-transform: uppercase; letter-spacing: 2px; }
+        .subtitle { color: var(--muted); margin-bottom: 25px; font-size: 0.85rem; }
+        .layout { display: grid; grid-template-columns: 420px 1fr; gap: 20px; }
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            height: 85vh;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+        .card { background: var(--panel); border: 1px solid var(--border); padding: 12px; border-radius: 4px; }
+        label { display: block; color: var(--active-slot); font-weight: bold; margin-bottom: 6px; font-size: 0.8rem; text-transform: uppercase; }
+        select, input[type="text"] {
+            width: 100%; padding: 8px; background: var(--bg); border: 1px solid var(--border);
+            color: var(--text); border-radius: 2px; font-family: monospace; box-sizing: border-box; font-size: 0.9rem;
+        }
+        input[type="text"] { color: #fcd34d; font-weight: bold; font-size: 1.1rem; }
+        .output-panel { display: flex; flex-direction: column; gap: 20px; }
+        .word-box { background: #02040a; border: 2px solid var(--accent); box-shadow: 0 0 15px var(--accent-glow); padding: 30px; border-radius: 4px; text-align: center; }
+        .raw-word { font-size: 3.5rem; color: #4ade80; font-weight: bold; letter-spacing: -1px; word-break: break-all; }
+        .matrix-title { color: var(--accent); font-size: 0.9rem; font-weight: bold; text-transform: uppercase; margin-bottom: 10px; text-align: left; }
+        .slots-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        .slot-card { background: var(--panel); border: 1px solid var(--border); padding: 10px; border-radius: 2px; position: relative; }
+        .slot-num { position: absolute; top: 4px; right: 6px; font-size: 0.65rem; color: var(--muted); }
+        .slot-name { color: var(--muted); font-size: 0.7rem; text-transform: uppercase; margin-bottom: 4px; }
+        .slot-content { font-size: 1.1rem; font-weight: bold; color: var(--text); }
+        .diagnostics { background: #090d16; border-left: 4px solid var(--ablaut-color); padding: 15px; font-size: 0.85rem; line-height: 1.4; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Dgamlian Verb Conjugator</h1>
+
+    <div class="layout">
+        <!-- Controls Column -->
+        <div class="controls">
+            
+            <div class="card">
+                <label for="root">S6: Lexical Root Core (Manual Entry)</label>
+                <input type="text" id="root" value="pts" oninput="processMatrix()">
+            </div>
+
+            <div class="card">
+                <label for="screeve">Target Verbal Screeve Selection</label>
+                <select id="screeve" onchange="processMatrix()">
+                    <optgroup label="Series I: Present/Future (Nominative-Dative)">
+                        <option value="pres">Present Indicative [-]</option>
+                        <option value="impf">Imperfective Past [-n]</option>
+                        <option value="pr_sub">Present Subjunctive [-l]</option>
+                        <option value="fut">Future Prospective [-p']</option>
+                        <option value="cond">Conditional Irrealis [-sh]</option>
+                        <option value="fut_sub">Future Subjunctive [-sk']</option>
+                    </optgroup>
+                    <optgroup label="Series II: Perfective/Aorist (Ergative Inversion)">
+                        <option value="aor_act">Aorist Active Agent [-kh]</option>
+                        <option value="aor_pas">Aorist Inactive Patient [-m]</option>
+                        <option value="opt">Optative Volitional [-v]</option>
+                    </optgroup>
+                    <optgroup label="Series III & IV: Evidential/Irrealis (Dative Inversion)">
+                        <option value="perf">Perfect Indirect [-g]</option>
+                        <option value="plup">Pluperfect Indirect [-st]</option>
+                        <option value="p_sub">Past Evidential Subjunctive [-ch]</option>
+                        <option value="hab">Habitual Past Frame [-z]</option>
+                        <option value="ev_fut">Presumptive Future [-q']</option>
+                        <option value="irrl">Absolute Complex Irrealis [-k]</option>
+                    </optgroup>
+                </select>
+            </div>
+
+            <div class="card">
+                <label for="subjSelect">Core Subject (Logical S/A Group)</label>
+                <select id="subjSelect" onchange="processMatrix()">
+                    <option value="v">v- (1st Person Singular Subject)</option>
+                    <option value="χ">χ- (1st Person Plural Subject)</option>
+                    <option value="b">b- (2nd Person Singular Subject)</option>
+                    <option value="ʃʷ">ʃʷ- (2nd Person Plural Subject)</option>
+                    <option value="d">d- (3rd Person Singular Subject)</option>
+                    <option value="ʁʷ">ʁʷ- (3rd Person Plural Subject)</option>
+                </select>
+            </div>
+
+            <div class="card">
+                <label for="doSelect">Direct Object (Logical P Group)</label>
+                <select id="doSelect" onchange="processMatrix()">
+                    <option value="">None (Intransitive Ground)</option>
+                    <option value="m">m- (1st Person Singular Object)</option>
+                    <option value="h">h- (1st Person Plural Object)</option>
+                    <option value="w">w- (2nd Person Singular Object)</option>
+                    <option value="t͡sʷ">t͡sʷ- (2nd Person Plural Object)</option>
+                    <option value="y">y- (3rd Person Singular Object)</option>
+                    <option value="gʷ">gʷ- (3rd Person Plural Object)</option>
+                </select>
+            </div>
+
+            <div class="card">
+                <label for="ioSelect">Indirect Object (Logical E Group)</label>
+                <select id="ioSelect" onchange="processMatrix()">
+                    <option value="">None (No Recipient)</option>
+                    <option value="l">l- (1st Person Singular Recipient)</option>
+                    <option value="st'">st'- (1st Person Plural Recipient)</option>
+                    <option value="r">r- (2nd Person Singular Recipient)</option>
+                    <option value="p'χ">p'χ- (2nd Person Plural Recipient)</option>
+                    <option value="q'">q'- (3rd Person Singular Recipient)</option>
+                    <option value="kʷ'">kʷ'- (3rd Person Plural Recipient)</option>
+                </select>
+            </div>
+
+            <div class="card">
+                <label for="s0">S0: Directional Preverb</label>
+                <select id="s0" onchange="processMatrix()">
+                    <option value="">None</option>
+                    <option value="z">z- (Downward) [+1 Front]</option>
+                    <option value="kh">kh- (Inward) [-1 Back]</option>
+                    <option value="t'">t'- (Outward) [Neutral]</option>
+                    <option value="p'χ">p'χ- (Across) [-1 Back]</option>
+                    <option value="q'">q'- (Oblique) [-1 Back]</option>
+                </select>
+            </div>
+
+            <div class="card">
+                <label for="s1">S1: Macro-Tense / Aspect Prefix</label>
+                <select id="s1" onchange="processMatrix()">
+                    <option value="">None</option>
+                    <option value="d">d- (Prospective) [Neutral]</option>
+                    <option value="r">r- (Habitual) [Neutral]</option>
+                    <option value="ʃ">ʃ- (Relativized) [+1 Front]</option>
+                </select>
+            </div>
+
+            <div class="card">
+                <label for="s5">S5: Relational Version Operator</label>
+                <select id="s5" onchange="processMatrix()">
+                    <option value="">None</option>
+                    <option value="j">j- (Reflexive) [+1 Front]</option>
+                    <option value="g">g- (Reflexive) [Neutral]</option>
+                    <option value="f'">f'- (Adversative) [Neutral]</option>
+                    <option value="χ">χ- (Subjective) [-1 Back]</option>
+                </select>
+            </div>
+
+            <div class="card">
+                <label for="s7">S7: Causative Valency Suffix</label>
+                <select id="s7" onchange="processMatrix()">
+                    <option value="">None</option>
+                    <option value="r">r- (Active Causative) [Neutral]</option>
+                    <option value="st'g">st'g- (Coercive) [+1 Front]</option>
+                    <option value="lɣ">lɣ- (Anticausative) [-1 Back]</option>
+                </select>
+            </div>
+
+            <div class="card">
+                <label for="s9">S9: Evidential Suffix</label>
+                <select id="s9" onchange="processMatrix()">
+                    <option value="">None</option>
+                    <option value="st'">st'- (Hearsay) [+1 Front]</option>
+                    <option value="mχ">mχ- (Inferred) [-1 Back]</option>
+                </select>
+            </div>
+
+            <div class="card">
+                <label for="s10">S10: Plurality Syncretism</label>
+                <select id="s10" onchange="processMatrix()">
+                    <option value="">None (Unmarked / Standard)</option>
+                    <option value="n">n- (1st/2nd Plural Co-Agreement) [Neutral]</option>
+                    <option value="q'">q'- (3rd Plural Plurality Marker) [-1 Back]</option>
+                </select>
+            </div>
+
+            <div class="card">
+                <label for="s11">S11: Pragmatic Status</label>
+                <select id="s11" onchange="processMatrix()">
+                    <option value="">None</option>
+                    <option value="p'v">p'v- (Counter-Expectational) [Neutral]</option>
+                    <option value="t͡ɬ">t͡ɬ- (Interrogative Request) [+1 Front]</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Output Column -->
+        <div class="output-panel">
+            <div class="word-box">
+                <div class="raw-word" id="wordDisplay">---</div>
+            </div>
+
+            <div class="card">
+                <div class="matrix-title">Symmetric Affix Distribution Profiles</div>
+                <div class="slots-grid" id="slotsDisplay"></div>
+            </div>
+
+            <div class="card diagnostics">
+                <div class="matrix-title" style="color: var(--ablaut-color);">Split Ergative Realization Profile</div>
+                <div><strong>Current Alignment Grid Type:</strong> <span id="diagAlignment" style="color: var(--active-slot); font-weight:bold;">-</span></div>
+                <div><strong>Phonetic Pressure Balance Score:</strong> <span id="pressureScore" style="font-weight:bold;">0</span></div>
+                <div><strong>Mutated Ablaut Target Vowel:</strong> <span id="vowelTarget" style="font-weight:bold; color: #4ade80;">-</span></div>
+                <div id="mutationNotes" style="margin-top: 8px; font-style: italic; color: #9ca3af;">Calculating cluster load...</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function processMatrix() {
+    try {
+        let rootInput = document.getElementById("root").value.trim();
+        let currentRoot = rootInput.replace(/[aeiouıə]/gi, "") || "pts";
+
+        const scr = document.getElementById("screeve").value;
+        const sub = document.getElementById("subjSelect").value;
+        const dir = document.getElementById("doSelect").value;
+        const ind = document.getElementById("ioSelect").value;
+
+        const s0 = document.getElementById("s0").value;
+        const s1 = document.getElementById("s1").value;
+        const s5 = document.getElementById("s5").value;
+        const s7 = document.getElementById("s7").value;
+        const s9 = document.getElementById("s9").value;
+        const s10 = document.getElementById("s10").value;
+        const s11 = document.getElementById("s11").value;
+
+        // Step 1: Compute Suffix segment string target for Slot 8
+        let targetSuffix = "";
+        switch(scr) {
+            case "pres":    targetSuffix = "";  break;
+            case "impf":    targetSuffix = "n";   break;
+            case "pr_sub":  targetSuffix = "l";   break;
+            case "fut":     targetSuffix = "p'";  break;
+            case "cond":    targetSuffix = "sh";  break;
+            case "fut_sub": targetSuffix = "sk'"; break;
+            case "aor_act": targetSuffix = "kh";  break;
+            case "aor_pas": targetSuffix = "m";   break;
+            case "opt":     targetSuffix = "v";   break;
+            case "perf":    targetSuffix = "g";   break;
+            case "plup":    targetSuffix = "st";  break;
+            case "p_sub":   targetSuffix = "ch";  break;
+            case "hab":     targetSuffix = "z";   break;
+            case "ev_fut":  targetSuffix = "q'";  break;
+            case "irrl":    targetSuffix = "k";   break;
+        }
+
+        let s2_val = "";
+        let s3_val = "";
+        let s4_val = "";
+        let alignmentTypeLabel = "";
+
+        // Map selections strictly to role-specific morphological shapes
+        let subjClitic = sub;
+        let directClitic = dir;
+        let indirectClitic = ind;
+
+        // Step 2: DYNAMIC SPLIT ERGATIVE PREFIX STRUCTURAL ROUTING ENGINE
+        if (scr === "pres" || scr === "impf" || scr === "pr_sub" || scr === "fut" || scr === "cond" || scr === "fut_sub") {
+            alignmentTypeLabel = "Series I: Nominative-Dative Tree (Linear Path active)";
+            s2_val = subjClitic;
+            s3_val = directClitic;
+            s4_val = indirectClitic;
+        } else if (scr === "aor_act" || scr === "aor_pas" || scr === "opt") {
+            alignmentTypeLabel = "Series II: Ergative-Absolutive Tree (Patient Chiasmic Inversion active)";
+            s2_val = directClitic || "y"; // DO mapped to Slot 2
+            s3_val = subjClitic;         // Subject Agent pushed to Slot 3
+            s4_val = indirectClitic;
+        } else {
+            alignmentTypeLabel = "Series III/IV: Dative Inversion Tree (Affective Subject Shift active)";
+            s2_val = "q'";               // Lock Slot 2 to Inversive System Marker
+            s3_val = directClitic;
+            s4_val = subjClitic;         // Subject Agent dropped to IO in Slot 4
+        }
+
+        // Type-Safe dictionary construction
+        let s = {
+            0: s0, 1: s1, 
+            2: s2_val, 3: s3_val, 4: s4_val,
+            5: s5,          
+            6: currentRoot, 
+            7: s7,
+            8: targetSuffix, 
+            9: s9, 10: s10, 11: s11
+        };
+
+        // Step 3: Run total synchronous computation score loop
+        let totalCalculatedPressure = 0;
+        const frontingTokens = ["z", "ʃ", "l", "ch", "st'", "j", "ts", "ndz", "t͡ɬ", "s", "χ", "h", "l", "st'"];
+        const backingTokens = ["kh", "q'", "p'χ", "ʁʷ", "w", "χ", "lɣ", "x", "mχ", "ʃʷ", "b", "t͡sʷ", "gʷ", "r", "p'χ", "kʷ'"];
+
+        for (let i = 0; i <= 11; i++) {
+            if (i !== 5 && i !== 6 && s[i]) {
+                let segment = s[i].replace(/[-]/g, "");
+                if (frontingTokens.includes(segment)) totalCalculatedPressure += 1;
+                if (backingTokens.includes(segment)) totalCalculatedPressure -= 1;
+            }
+        }
+
+        // Step 4: Map mathematical calculations onto the chameleon nucleus
+        let targetedCoreVowel = "ə"; 
+        let fortifyRootActive = false;
+
+        if (totalCalculatedPressure === 0) {
+            targetedCoreVowel = "a";
+        } else if (totalCalculatedPressure === 1 || totalCalculatedPressure === 2) {
+            targetedCoreVowel = "e";
+        } else if (totalCalculatedPressure === -1 || totalCalculatedPressure === -2) {
+            targetedCoreVowel = "o";
+        } else if (totalCalculatedPressure >= 3) {
+            targetedCoreVowel = "i"; 
+            fortifyRootActive = true;
+        } else if (totalCalculatedPressure <= -3) {
+            targetedCoreVowel = "u"; 
+            fortifyRootActive = true;
+        }
+
+        // Safe dictionary modification
+        s[5] = s5 + targetedCoreVowel;
+
+        // Apply automatic radical glottalization rules if pressure environment scales to absolute extremes
+        if (fortifyRootActive) {
+            if (/^[ptkq]/.test(currentRoot) && !currentRoot.charAt(1).includes("'")) {
+                let initialChar = currentRoot.charAt(0);
+                let remainderChars = currentRoot.slice(1);
+                s[6] = initialChar + "'" + remainderChars; 
+            }
+        }
+
+        // Step 5: Render final assembled wordform strings and map table slot output profiles
+        let finalAssembledWord = "";
+        let visualGridHTML = "";
+        const slotLabels = [
+            "S0: Preverb", "S1: Macro-Tense", "S2: Slot Segment 2", "S3: Slot Segment 3",
+            "S4: Slot Segment 4", "S5: Version+Ablaut", "S6: ROOT Core", "S7: Causative",
+            "S8: Screeve Suffix", "S9: Evidential Suffix", "S10: Plurality", "S11: Pragmatic"
+        ];
+
+        for (let i = 0; i <= 11; i++) {
+            let segmentPiece = s[i] || "";
+            finalAssembledWord += segmentPiece;
+            visualGridHTML += `
+                <div class="slot-card" style="border-top: 3px solid ${segmentPiece ? 'var(--active-slot)' : 'var(--border)'}">
+                    <div class="slot-num">${i}</div>
+                    <div class="slot-name">${slotLabels[i]}</div>
+                    <div class="slot-content">${segmentPiece || "-"}</div>
+                </div>`;
+        }
+
+        document.getElementById("wordDisplay").innerText = finalAssembledWord || "---";
+        document.getElementById("slotsDisplay").innerHTML = visualGridHTML;
+        document.getElementById("pressureScore").innerText = (totalCalculatedPressure > 0 ? "+" : "") + totalCalculatedPressure;
+        document.getElementById("vowelTarget").innerText = `/${targetedCoreVowel}/`;
+        document.getElementById("diagAlignment").innerText = alignmentTypeLabel;
+
+        let diagnosticNote = "Standard linear consonantal pressure. Vowel profile remains stable.";
+        if (totalCalculatedPressure >= 3) diagnosticNote = "CRITICAL FRONTING PRESSURE! Overdrive triggers change to /i/ and forces radical glottalization onto the root cluster.";
+        if (totalCalculatedPressure <= -3) diagnosticNote = "CRITICAL BACKING PRESSURE! Overdrive triggers change to /u/ and forces radical glottalization onto the root cluster.";
+        document.getElementById("mutationNotes").innerText = diagnosticNote;
+
+    } catch (e) {
+        document.getElementById("wordDisplay").innerText = "ENGINE_FAULT";
+    }
+}
+
+window.onload = function() { processMatrix(); };
+</script>
+</body>
+</html>
